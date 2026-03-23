@@ -28,6 +28,25 @@ def _extract(query, ydl_opts):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         return ydl.extract_info(query, download=False)
 
+import threading
+import os
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+    def log_message(self, format, *args):
+        pass
+
+def run_health_server():
+    port = int(os.environ.get("PORT", 8080))  # Render sets PORT automatically
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    print(f"[health] Listening on port {port}")
+    server.serve_forever()
+
+threading.Thread(target=run_health_server, daemon=True).start()
 
 @bot.event
 async def on_ready():
