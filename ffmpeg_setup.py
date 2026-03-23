@@ -71,15 +71,15 @@ async def _ensure_linux() -> str:
         return system_ffmpeg
 
     # 2. Build-time binary (placed by build.sh)
-    BUILD_BIN = os.path.join(os.path.dirname(__file__), "ffmpeg_linux", "ffmpeg")
+    BUILD_BIN = os.path.join(os.path.dirname(__file__), "ffmpeg_auto", "linux", "ffmpeg")
     if os.path.isfile(BUILD_BIN) and os.access(BUILD_BIN, os.X_OK):
         print(f"[ffmpeg] Render build binary: {BUILD_BIN}")
         return BUILD_BIN
 
-    # 3. Fallback: download at runtime (only if build.sh somehow didn't run)
-    if os.path.isfile(FFMPEG_BIN_LINUX) and os.access(FFMPEG_BIN_LINUX, os.X_OK):
-        print(f"[ffmpeg] Using cached Linux binary: {FFMPEG_BIN_LINUX}")
-        return FFMPEG_BIN_LINUX
+    # # 3. Fallback: download at runtime (only if build.sh somehow didn't run)
+    # if os.path.isfile(FFMPEG_BIN_LINUX) and os.access(FFMPEG_BIN_LINUX, os.X_OK):
+    #     print(f"[ffmpeg] Using cached Linux binary: {FFMPEG_BIN_LINUX}")
+    #     return FFMPEG_BIN_LINUX
 
     print("[ffmpeg] Downloading FFmpeg for Linux...")
     import tarfile

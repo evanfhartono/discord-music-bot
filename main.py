@@ -15,9 +15,6 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 FFMPEG_PATH = None
 SONG_QUEUES = {}
 
-intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 async def search_ytdlp_async(query, ydl_opts):
@@ -41,38 +38,25 @@ class HealthHandler(BaseHTTPRequestHandler):
         pass
 
 def run_health_server():
-    port = int(os.environ.get("PORT", 8080))  # Render sets PORT automatically
+    port = int(os.environ.get("PORT", 8080))
     server = HTTPServer(("0.0.0.0", port), HealthHandler)
     print(f"[health] Listening on port {port}")
     server.serve_forever()
 
 threading.Thread(target=run_health_server, daemon=True).start()
 
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix="!", intents=intents)
+
 @bot.event
 async def on_ready():
     global FFMPEG_PATH
     FFMPEG_PATH = await ensure_ffmpeg()
-
-    GUILD_IDS = [
-        1196853188968587404,
-        1092056459400982688,
-        1090975359543021590,
-    ]
-
-    for guild_id in GUILD_IDS:
-        guild = discord.Object(id=guild_id)
-        bot.tree.copy_global_to(guild=guild)
-        try:
-            await bot.tree.sync(guild=guild)
-            print(f"Synced commands to guild {guild_id}")
-        except discord.errors.Forbidden:
-            print(f"[WARN] Missing access for guild {guild_id} — skipping")
-        except Exception as e:
-            print(f"[ERROR] Failed to sync guild {guild_id}: {e}")
-
-    print("==================================================")
-    print("=================BOT IS RUNNING===================")
-    print("==================================================")
+    
+    # Syncing logic...
+    await bot.tree.sync() # Recommendation: Sync globally for simplicity unless testing
+    print("BOT IS RUNNING")
 
 
 @bot.tree.command(name="play", description="Play a song or add it to the queue.")
